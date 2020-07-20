@@ -2,74 +2,68 @@ language: python
 sudo: required
 dist: xenial
 before_install:
-- chmod +x .travis/*.sh
+- chmod +x .build/.travis/*.sh
 matrix:
   include:
-  - env: IMG="ubuntu1604"
+  - env: IMG="ubuntu1604" BUILD_TARGET="standalone" BUID_EDITION="" UST_EXTENSION=1
     python:
     - 3.6
     install:
-    - .travis/install-ubuntu.sh
+    - ".build/.travis/install-ubuntu.sh"
     script:
-    - .travis/build-py36.sh
-    - .travis/release.sh
+    - ".build/.travis/build-py36.sh"
+    - ".build/.travis/release.sh"
     - python setup.py test
-#  - env: IMG="ubuntu1604"
-#    python:
-#    - 2.7
-#    install:
-#    - .travis/install-ubuntu.sh
-#    script:
-#    - .travis/build-py27.sh
-#    - .travis/release.sh
-#    - python setup.py test
-#  - env:
-#    - OS="centos:7"
-#    - IMG="centos7"
-#    - SH="docker exec -t ${IMG} bash -c"
-#    services:
-#    - docker
-#    # for logging purposes
-#    python:
-#    - 3.6
-#    before_install:
-#    - chmod +x .travis/*.sh
-#    - docker run -d --name ${IMG} -v $(pwd):/travis -w /travis -e IMG="${IMG}" -e TRAVIS_TAG="${TRAVIS_TAG}" ${OS} tail -f /dev/null
-#    - docker ps
-#    install:
-#    - $SH .travis/install-centos.sh
-#    script:
-#    - $SH .travis/build-py36-centos.sh
-#  - env:
-#    - OS="centos:7"
-#    - IMG="centos7"
-#    - SH="docker exec -t ${IMG} bash -c"
-#    services:
-#    - docker
-#    # for logging purposes
-#    python:
-#    - 2.7
-#    before_install:
-#    - chmod +x .travis/*.sh
-#    - docker run -d --name ${IMG} -v $(pwd):/travis -w /travis -e IMG="${IMG}" -e TRAVIS_TAG="${TRAVIS_TAG}" ${OS} tail -f /dev/null
-#    - docker ps
-#    install:
-#    - $SH .travis/install-centos.sh
-#    script:
-#    - $SH .travis/build-py27.sh
-#    - $SH .travis/release.sh
-#    - $SH "python setup.py test"
+  - env: IMG="ubuntu1604" BUILD_TARGET="standalone" BUILD_EDITION="-noext" UST_EXTENSION=0
+    python:
+      - 3.6
+    install:
+      - ".build/.travis/install-ubuntu.sh"
+    script:
+      - ".build/.travis/build-py36.sh"
+      - ".build/.travis/release.sh"
+      - python setup.py test
+  - env: OS="centos:7" IMG="centos7" SH="docker exec -t ${IMG} bash -c"
+    services:
+    - docker
+    python:
+    - 3.6
+    before_install:
+    - chmod +x .build/.travis/*.sh
+    - docker run -d --name ${IMG} -v $(pwd):/travis -w /travis -e IMG="${IMG}" -e
+      TRAVIS_TAG="${TRAVIS_TAG}" -e BUILD_TARGET="standalone" -e BUILD_EDITION=""
+      -e UST_EXTENSION=1 -e LC_ALL=en_US.utf8 ${OS} tail -f /dev/null
+    - docker ps
+    install:
+    - "$SH .build/.travis/install-centos.sh"
+    script:
+    - "$SH .build/.travis/build-py36-centos.sh"
+  - env: OS="centos:7" IMG="centos7" SH="docker exec -t ${IMG} bash -c"
+    services:
+      - docker
+    python:
+      - 3.6
+    before_install:
+      - chmod +x .build/.travis/*.sh
+      - docker run -d --name ${IMG} -v $(pwd):/travis -w /travis -e IMG="${IMG}" -e
+        TRAVIS_TAG="${TRAVIS_TAG}" -e BUILD_TARGET="standalone" -e BUILD_EDITION="-noext"
+        -e UST_EXTENSION=0 -e LC_ALL=en_US.utf8 ${OS} tail -f /dev/null
+      - docker ps
+    install:
+      - "$SH .build/.travis/install-centos.sh"
+    script:
+      - "$SH .build/.travis/build-py36-centos.sh"
 
 deploy:
   provider: releases
   api_key:
     secure: BhYiumgaInTG0L+6oSVT5n0RQLus78V3NQejtCxnY5spPbTxsmP30KCAZkvzVedvOmZjssvDsz5KMPAxbPlgySQPZfal/cQSFv/9C/H5KI21MAOFXu1P+swyR83XGLgUH0DeCZV0NtTDsrpW/yuIoRLnWUqykS+V3j51vhH/IjrQeBhPGJR5G4CLE2/JdWdRlEzZOX/tjMpwXMxYv7mOcLlU8jfrEpAH0ahpINQxRm4rmvFrBgtQNpfBEHBh5tYlD47zrWloLJzreMxp07QZjM9xg/iftyjDd/y+wIkSbmQji9LRr/n1nAMmbB5h8ARHB6jaMqeJOQv7ugw0izSkUdWYv8y2AQI1ku25sanUEgbDCPUU/SzZGgtohx+Wm5CisYbU8LRUxX7VZQJ3dCqQbMAIlY4l047pePDLhllBCqI8XS6QU5ekirGrMWSbALBvT8do8QoOZ5y1I5owaA/uuYGvd80HYRGAHMtiMQEZrnM81HrceIUMRgrHp7bK+teM+3OwgC1NKMk6aWE41RKrheZ0MU7R/Nhk8X7EJq65DFiA/pnR2HDFfdgJdlizncG+lwO7RZNT4zrQAysmGgpnhVO63qDoB+kL2gCKI301NCLGSPf/81XTWMkD419in2nFpzYe9IYPh4dRsloZv/eaJrCZ6NokJJ/sBbPUMRW/x8A=
   file_glob: true
-  file: release/*.gz
   skip_cleanup: true
   draft: true
   true:
     tags: false
     repo: vossen-adobe/user-sync-fork
     all_branches: true
+    tags: true
 
