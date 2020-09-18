@@ -63,5 +63,6 @@ def bundle_feature_flag_config():
 
 if __name__ == '__main__':
     cd()
+    bundle_feature_flag_config()
     bundle_example_config('config files - basic')
     bundle_example_config('sign')
