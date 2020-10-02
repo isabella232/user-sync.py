@@ -19,17 +19,14 @@ make $env:BUILD_TARGET 2>&1
 dir dist
 mkdir release
 
-$istrue = ${env:APPVEYOR_REPO_TAG} -eq $true
-
-Write-Host "TAGGED: ${env:APPVEYOR_REPO_TAG}"
-Write-Host "TAGGED true: ${istrue}"
-
-#if ($env:APPVEYOR_REPO_TAG)
-cp dist\user-sync.exe release\
-cd release
-7z a "user-sync-${env:APPVEYOR_REPO_TAG_NAME}${env:BUILD_EDITION}-win64.zip" user-sync.exe
-cd ..
-7z a -ttar release\examples.tar examples
-7z a -tgzip release\examples.tar.gz release\examples.tar
-7z a release\examples.zip examples\
-dir release
+if (${env:APPVEYOR_REPO_TAG} -eq $true)
+{
+    cp dist\user-sync.exe release\
+    cd release
+    7z a "user-sync-${env:APPVEYOR_REPO_TAG_NAME}${env:BUILD_EDITION}-win64.zip" user-sync.exe
+    cd ..
+    7z a -ttar release\examples.tar examples
+    7z a -tgzip release\examples.tar.gz release\examples.tar
+    7z a release\examples.zip examples\
+    dir release
+}
